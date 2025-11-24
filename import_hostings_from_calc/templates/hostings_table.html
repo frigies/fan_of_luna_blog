@@ -1,0 +1,56 @@
+<table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead style="background-color: #f2f2f2;">
+        <tr>
+            <th>Название</th>
+            <th>Статус</th>
+            <th>Риск</th>
+            <th>Мин. цена ($)</th>
+            <th>Расположение</th>
+            <th>Преимущества</th>
+            <th>Недостатки</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hosting in hostings %}
+        <tr>
+            <td>
+                <a href="{{ hosting.url }}" target="_blank">{{ hosting.hosting_name }}</a>
+                {% if hosting.favorite %} ⭐ {% endif %}
+            </td>
+            <td class="{{ hosting.status_class }}">
+                {{ hosting.status or '-' }}
+            </td>
+            <td>{{ hosting.risk or '-' }}</td>
+            <td>
+                {% if hosting.min_price_in_dollars %}
+                    ${{ "%.2f"|format(hosting.min_price_in_dollars) }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if hosting.hosting_location %}
+                    {{ hosting.hosting_location }}
+                    {% if hosting.servers_location and hosting.servers_location != hosting.hosting_location %}
+                        <br><small>(серверы: {{ hosting.servers_location }})</small>
+                    {% endif %}
+                {% else %}
+                    {{ hosting.servers_location or '-' }}
+                {% endif %}
+            </td>
+            <td>{{ hosting.advantages or '-' }}</td>
+            <td>{{ hosting.disadvantages or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" style="text-align: center;">Нет данных по выбранным фильтрам</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if hostings %}
+<div style="margin-top: 10px; color: #666;">
+    Найдено записей: {{ hostings|length }}
+</div>
+{% endif %}
