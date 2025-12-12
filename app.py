@@ -3,8 +3,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_limiter.errors import RateLimitExceeded
 import os
-# import psycopg2
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash
 
 
 app = Flask(__name__)
@@ -18,8 +18,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-app.secret_key = 'your-secret-key'
-APP_PASSWORD = '123'  # В реальном приложении используйте хеширование
+app.secret_key = os.getenv('BLOG_FLASK_APP_SECRET_KEY')
+APP_PASSWORD_HASHED = os.getenv('BLOG_PASSWORD_HASH')
 
 limiter = Limiter(
     app=app,
@@ -138,23 +138,16 @@ def get_filtered_hostings(**filters):
     return query
 
 
-# @app.route('/login', methods=['POST'])
-# def login():
-#     if request.form.get('password') == APP_PASSWORD:
-#         session['authenticated'] = True
-#         return redirect(url_for('index'))
-#     else:
-#         flash('Неверный пароль')
-#         return redirect(url_for('index'))
-
-
 @app.route('/login', methods=['POST'])
 @limiter.limit("5 per minute;20 per hour")
 def login():
     # Получаем URL, с которого пришел запрос (текущая страница)
     referrer = request.referrer or url_for('index')
     
-    if request.form.get('password') == APP_PASSWORD:
+    # if request.form.get('password') == APP_PASSWORD:
+    # APP_PASSWORD_HASHED = "scrypt:32768:8:1$z3kOQDcsAgbdxFK0$966fe1fd349be9618a7a1af5569f9fa91b7d27fb4c9486ec084175ad2656108edbc331f34d02a66b062070a1e28de84905acd00e2dfbc63b5f34b44a04489222"
+    # print(APP_PASSWORD_HASHED)
+    if check_password_hash(APP_PASSWORD_HASHED, request.form.get('password', '')):
         session['authenticated'] = True
         # Возвращаем на ту же страницу, откуда пришли
         return redirect(referrer)
@@ -181,10 +174,10 @@ def xray_server_setup():
     return render_template('xray_server_setup.html')
 
 
-@app.route('/hostings')
+@app.route('/hostings_list')
 def hostings():
     categories = Category.query.all()
-    return render_template('hostings.html', categories=categories)
+    return render_template('hostings_list.html', categories=categories)
 
 
 @app.route('/hostings_table')

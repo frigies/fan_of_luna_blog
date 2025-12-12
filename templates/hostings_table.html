@@ -1,4 +1,9 @@
-<table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+{% if hostings %}
+<div style="margin-top: 10px; color: #666;">
+    Найдено записей: {{ hostings|length }}
+</div>
+{% endif %}
+<table class="table table-bordered" border="1" style="">
     <thead style="background-color: #f2f2f2;">
         <tr>
             <th>Название</th>
@@ -49,8 +54,3 @@
     </tbody>
 </table>
 
-{% if hostings %}
-<div style="margin-top: 10px; color: #666;">
-    Найдено записей: {{ hostings|length }}
-</div>
-{% endif %}
