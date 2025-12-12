@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}FanOfLuna Blog{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for ('static', filename='css/index.css') }}">
+{% endblock %}
+{% block content %}
+<center>
+  <nav id="main-nav">
+      <p><a href="xray_server_setup" target="_blank">Настройка XRay на сервере</a></p>
+      <p><a href="xray_client_setup" target="_blank">Настройка XRay на клиенте</a></p>
+      <!-- <p><a href="earning_list" target="_blank">Мой список сайтов для заработка</a></p> -->
+      <!-- <p><a href="browser_extensions" target="_blank">Мой список расширений для браузера</a></p> -->
+  </nav>
+</center>
+{% endblock %}

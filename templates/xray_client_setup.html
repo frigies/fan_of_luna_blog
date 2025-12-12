@@ -1,21 +1,11 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
-<head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>xray_client_setup</title>
-  <link rel="stylesheet" href="./css/xray_client_setup.css">
-  <script>
-    window.onload = function() {
-        const links = document.querySelectorAll('a');
-        links.forEach(link => {
-            link.setAttribute('target', '_blank');
-        });
-    };
-</script>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}xray_client_setup{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for ('static', filename='css/xray_client_setup.css') }}">
+{% endblock %}
+{% block content %}
 <section id="установка-и-настройка-xray-на-клиенте" class="level2">
 <h2>Установка и настройка XRay на клиенте</h2>
 <section id="устанавливаем-nekoray" class="level3">
@@ -184,5 +174,4 @@
 <p>Если это так, то можем запустить выбранный профиль, кликнув правой кнопкой мыши -&gt; Запустить. Или просто нажав клавишу Enter.</p>
 </section>
 </section>
-</body>
-</html>
+{% endblock %}

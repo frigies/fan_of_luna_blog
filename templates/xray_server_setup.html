@@ -1,21 +1,11 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
-<head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>xray_server_setup</title>
-  <link rel="stylesheet" href="./css/xray_server_setup.css">
-  <script>
-      window.onload = function() {
-          const links = document.querySelectorAll('a');
-          links.forEach(link => {
-              link.setAttribute('target', '_blank');
-          });
-      };
-  </script>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}xray_server_setup{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for ('static', filename='css/xray_server_setup.css') }}">
+{% endblock %}
+{% block content %}
 <section id="установка-xray-на-сервере-ubuntu-или-debian" class="level1">
 <h1>Установка XRay на сервере Ubuntu или Debian</h1>
 <section id="подготовка" class="level2">
@@ -293,5 +283,4 @@ net.ipv6.conf.lo.disable_ipv6 = 1</code></pre>
 <p>Если есть ошибки, они будут показаны. Например, XRay может ругнуться что не удается распарсить JSON-файл, обычно это связано с лишними запятыми в конце {} блока, в этом случае он укажет, на какой строке ошибка. Исправляем ошибки, перезапускаем еще раз, и переходим к настройке клиента.</p>
 </section>
 </section>
-</body>
-</html>
+{% endblock %}

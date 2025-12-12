@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_limiter.errors import RateLimitExceeded
 import os
-import psycopg2
+# import psycopg2
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -14,6 +17,24 @@ db_password = os.getenv('BLOG_DB_PASSWORD')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{db_host}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+app.secret_key = 'your-secret-key'
+APP_PASSWORD = '123'  # В реальном приложении используйте хеширование
+
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["100 per day"]
+)
+
+@app.errorhandler(RateLimitExceeded)
+def ratelimit_handler(e):
+    # Проверяем путь запроса
+    if request.path == '/login' and request.method == 'POST':
+        flash('Слишком много попыток входа. Попробуйте позже.')
+        return redirect(request.referrer or url_for('index'))
+    
+    return "Too Many Requests", 429
 
 
 class Category(db.Model):
@@ -117,15 +138,57 @@ def get_filtered_hostings(**filters):
     return query
 
 
+# @app.route('/login', methods=['POST'])
+# def login():
+#     if request.form.get('password') == APP_PASSWORD:
+#         session['authenticated'] = True
+#         return redirect(url_for('index'))
+#     else:
+#         flash('Неверный пароль')
+#         return redirect(url_for('index'))
 
-@app.route('/')
-def index():
+
+@app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute;20 per hour")
+def login():
+    # Получаем URL, с которого пришел запрос (текущая страница)
+    referrer = request.referrer or url_for('index')
+    
+    if request.form.get('password') == APP_PASSWORD:
+        session['authenticated'] = True
+        # Возвращаем на ту же страницу, откуда пришли
+        return redirect(referrer)
+    else:
+        flash('Неверный пароль')
+        # Возвращаем на ту же страницу с сообщением об ошибке
+        return redirect(referrer)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('authenticated', None)
+    flash('Вы вышли из системы')
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/xray_client_setup')
+def xray_client_setup():
+    return render_template('xray_client_setup.html')
+
+
+@app.route('/xray_server_setup')
+def xray_server_setup():
+    return render_template('xray_server_setup.html')
+
+
+@app.route('/hostings')
+def hostings():
     categories = Category.query.all()
-    return render_template('index.html', categories=categories)
+    return render_template('hostings.html', categories=categories)
 
 
 @app.route('/hostings_table')
-def show_table():
+def show_hostings_table():
     # Собираем параметры фильтрации
     category_id = request.args.get('category', type=int)
     max_price = request.args.get('max_price', type=float)
@@ -152,3 +215,8 @@ def show_table():
     
     hostings = query.all()
     return render_template('hostings_table.html', hostings=hostings)
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
