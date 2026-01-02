@@ -164,6 +164,11 @@ def logout():
     return redirect(request.referrer or url_for('index'))
 
 
+@app.route('/creating_server_and_preparing_it_for_work')
+def creating_server_and_preparing_it_for_work():
+    return render_template('creating_server_and_preparing_it_for_work.html')
+
+
 @app.route('/xray_client_setup')
 def xray_client_setup():
     return render_template('xray_client_setup.html')
